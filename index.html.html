@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>API Testing Exam</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef1f6;--surface:#fff;--ink:#16213a;--mut:#5d6882;--line:#d7ddea;
+  --ac:#1d4ed8;--ac-soft:#e6edff;--warn:#b45309;--warn-soft:#fff3e0;--bad:#b42318;--ok:#067647;--ok-soft:#e3f6ec;
+  --serif:"Fraunces",Georgia,"Times New Roman",serif;--sans:"Inter",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1524;--surface:#18203a;--ink:#eef1fa;--mut:#9aa6c4;--line:#2d3858;--ac:#7aa2ff;--ac-soft:#1f2c55;--warn:#fbbf24;--warn-soft:#3a2d12;--bad:#ff8a7a;--ok:#4ade80;--ok-soft:#12301f}}
+:root[data-theme="dark"]{--bg:#0f1524;--surface:#18203a;--ink:#eef1fa;--mut:#9aa6c4;--line:#2d3858;--ac:#7aa2ff;--ac-soft:#1f2c55;--warn:#fbbf24;--warn-soft:#3a2d12;--bad:#ff8a7a;--ok:#4ade80;--ok-soft:#12301f}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.6;min-height:100vh;-webkit-tap-highlight-color:transparent}
+/* protection only while the exam is running */
+body.locked{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+body.locked input{-webkit-user-select:text;user-select:text}
+.wrap{max-width:720px;margin:0 auto;padding:20px 16px 96px}
+h1,h2{font-family:var(--serif);font-weight:600;letter-spacing:-.01em;margin:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px}
+.intro h1{font-size:32px;line-height:1.2;margin-bottom:6px}
+.intro .sub{color:var(--mut);margin:0 0 22px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:22px}
+.fact{background:var(--bg);border-radius:12px;padding:14px 16px}
+.fact b{display:block;font-family:var(--serif);font-size:26px;line-height:1.1}
+.fact span{color:var(--mut);font-size:14px}
+.rules{margin:0 0 24px;padding:0;list-style:none;display:grid;gap:10px}
+.rules li{padding-left:26px;position:relative;font-size:15px}
+.rules li::before{content:"";position:absolute;left:0;top:.55em;width:10px;height:10px;border-radius:50%;background:var(--line)}
+.rules li.hard::before{background:var(--bad)}
+label.f{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+input[type=text]{width:100%;padding:14px;border:1.5px solid var(--line);border-radius:12px;font:inherit;background:var(--bg);color:var(--ink);outline:none}
+input[type=text]:focus{border-color:var(--ac)}
+.btn{font:inherit;font-weight:600;background:var(--ac);color:#fff;border:0;border-radius:12px;padding:14px 26px;cursor:pointer;transition:transform .08s}
+:root[data-theme="dark"] .btn{color:#0b1226}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{color:#0b1226}}
+.btn:active{transform:scale(.98)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.ghost{background:transparent!important;color:var(--ink)!important;border:1.5px solid var(--line)}
+.btn.full{width:100%;margin-top:16px}
+.btn:focus-visible,.opt:focus-visible{outline:3px solid var(--ac);outline-offset:2px}
+.err{color:var(--bad);font-size:14px;margin:6px 0 0;min-height:1.2em}
+
+/* exam */
+.head{position:sticky;top:0;background:var(--bg);padding:12px 0 10px;z-index:3}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.who{font-size:14px;color:var(--mut);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.count{font-variant-numeric:tabular-nums;font-weight:600;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 14px;font-size:15px}
+.dots{display:flex;gap:4px}
+.dots i{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.dots i.done{background:var(--ac)}
+.dots i.cur{background:var(--ink)}
+.q{font-size:22px;line-height:1.4;margin:22px 0 22px;white-space:pre-line}
+.opt{display:flex;gap:14px;align-items:flex-start;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--surface);
+  border:1.5px solid var(--line);border-radius:14px;padding:15px 16px;margin-bottom:10px;cursor:pointer;transition:border-color .12s,background .12s}
+.opt .k{flex:none;width:30px;height:30px;border-radius:8px;border:1.5px solid var(--line);display:grid;place-items:center;font-weight:600;font-size:14px;color:var(--mut)}
+.opt.sel{border-color:var(--ac);background:var(--ac-soft)}
+.opt.sel .k{background:var(--ac);border-color:var(--ac);color:#fff}
+.bottom{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);padding:12px 16px calc(12px + env(safe-area-inset-bottom,0px));z-index:3}
+.bottom .in{max-width:720px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:12px}
+
+/* end / result */
+.end{text-align:center;padding:44px 24px}
+.end .ic{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;font-size:26px;background:var(--ac-soft)}
+.end.bad .ic{background:var(--warn-soft)}
+.end h2{font-size:26px;margin-bottom:8px}
+.end p{color:var(--mut);margin:0}
+.end .btn{margin-top:22px}
+.spin{width:44px;height:44px;border-radius:50%;border:4px solid var(--line);border-top-color:var(--ac);margin:0 auto 18px;animation:sp 0.9s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.res{padding:34px 24px 28px;text-align:center}
+.res .exam{color:var(--mut);font-size:14px;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px}
+.res .nm{font-family:var(--serif);font-size:24px;margin-bottom:18px;word-break:break-word}
+.res .big{font-family:var(--serif);font-size:72px;line-height:1;font-weight:600}
+.res .big small{font-size:32px;color:var(--mut);font-weight:500}
+.res .pct{display:inline-block;margin:14px 0 6px;font-weight:600;font-size:18px;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:4px 16px}
+.res.low .pct{background:var(--warn-soft);color:var(--warn)}
+.bar{height:10px;border-radius:5px;background:var(--line);margin:14px auto 22px;max-width:360px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);border-radius:5px}
+.res.low .bar i{background:var(--warn)}
+.meta{border-top:1px solid var(--line);padding-top:16px;display:grid;gap:6px;font-size:14px;color:var(--mut)}
+.meta b{color:var(--ink);font-weight:600}
+.note{margin-top:18px;font-size:13px;color:var(--mut)}
+.warnline{margin:0 0 16px;padding:10px 14px;border-radius:10px;background:var(--warn-soft);color:var(--warn);font-size:14px}
+#shield{position:fixed;inset:0;background:var(--bg);z-index:9;display:none}
+@media (max-width:480px){.panel{padding:20px}.q{font-size:20px}.intro h1{font-size:27px}.res .big{font-size:60px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* printing is blocked only while the exam is running */
+@media print{body.locked{display:none!important}}
+</style>
+</head>
+<body>
+<div id="shield"></div>
+<div class="wrap" id="app"></div>
+<script>
+/* ============ SETTINGS — edit here ============ */
+const EXAM_TITLE = "API Testing: Final Quiz";
+const SUBTITLE   = "Multiple choice questions";
+const SHEET_URL  = "https://script.google.com/macros/s/AKfycbx2O6RUX-fHPVN90y_VP36M6idHdrhEcPzHy11iWaWw0tFL6yau4WoeB_2_90OXm0E/exec";
+const FLAG   = "api_exam_done_v1";     // change this key when you publish a NEW exam on the same site
+const RESKEY = "api_exam_result_v1";
+const PENDKEY= "api_exam_pending_v1";
+// Correct answers are NOT stored here. They live in Code.gs (ANSWER_KEY).
+const QUESTIONS = [
+  {q:"What is an API?", o:["A database that stores user data", "A programming language", "A set of rules that lets one software talk to another", "A type of web browser"]},
+  {q:"In the restaurant analogy, what is the waiter?", o:["The client", "The API", "The server", "The database"]},
+  {q:"What does \"stateless\" mean in HTTP?", o:["The server remembers every user", "The server remembers nothing between requests", "Requests are never answered", "The API has no status codes"]},
+  {q:"Which method creates a new resource?", o:["GET", "PUT", "DELETE", "POST"]},
+  {q:"What is the difference between PUT and PATCH?", o:["There is no difference", "PUT reads, PATCH writes", "PUT replaces the whole resource, PATCH updates part of it", "PUT deletes, PATCH creates"]},
+  {q:"Why is calling DELETE /users/6 twice usually safe, while calling POST /users twice is not?", o:["DELETE is faster", "POST needs a token", "DELETE is idempotent, while POST creates a new record each time", "DELETE has no body"]},
+  {q:"A user sends a request with no token. Which code should come back?", o:["200", "401", "403", "404"]},
+  {q:"A normal user calls an admin endpoint with a valid token. Which code should come back?", o:["401", "404", "500", "403"]},
+  {q:"You send invalid data and the API returns 500. What does this mean?", o:["It's a bug; it should return a 400", "The API works correctly", "The client is at fault", "The token expired"]},
+  {q:"Which part of the URL filters or sorts a list?", o:["Base URL", "Path parameter", "Header", "Query parameter"]},
+  {q:"Which header tells the server the format of the data being sent?", o:["Content-Type", "Accept", "Authorization", "Location"]},
+  {q:"A mobile app shows \"Order not found\" for order 123, but the order exists in the database. The API returned 200 OK with an empty body. What's the most likely problem?", o:["The database is down", "The client sent the wrong header", "The API returned the wrong status and data, so it's a bug", "This is correct behavior"]},
+  {q:"You test POST /users with an existing email and get 201 Created. What does this tell you?", o:["The test passed", "The API is missing a duplicate check; it should return 409", "The email was invalid", "The server is slow"]},
+  {q:"A user logged in as user 5 calls GET /orders/6 and sees another customer's data. Which test type would catch this?", o:["Boundary testing", "Security (authorization) testing", "Performance testing", "Contract testing"]},
+  {q:"A developer says: \"The login screen already blocks empty passwords, so we don't need to test it in the API.\" What's the flaw?", o:["None, the UI is enough", "Passwords are always valid", "APIs don't have passwords", "The API can be called directly, bypassing the UI, so it must validate too"]},
+  {q:"GET /products?limit=5&page=2 returns 20 items. What should you conclude?", o:["Everything is fine", "The status code is wrong", "The token expired", "Pagination isn't working as expected"]},
+  {q:"After POST /users returns 201 with correct data, GET /users/6 returns 404. What happened?", o:["The test passed", "The GET method is wrong", "The response looked right, but the data wasn't actually saved", "The headers were missing"]},
+  {q:"A test works on Monday but fails on Tuesday with 401, and nothing in the API changed. What's the likely cause?", o:["A hardcoded token expired", "The method changed", "The JSON is invalid", "The server is broken"]},
+  {q:"One failing test causes five other tests to fail. Why?", o:["The API has five bugs", "The tests depend on each other's data and results", "The status codes are wrong", "The tool is old"]},
+  {q:"Where does API testing sit in the Test Pyramid?", o:["At the top, with few tests", "At the bottom, with the most tests", "Outside the pyramid", "In the middle, with integration tests"]}
+];
+/* =============================================== */
+
+const $ = id => document.getElementById(id);
+const app = $("app"), shield = $("shield");
+const shuf = a => { a=a.slice(); for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]} return a };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LET = "ABCD";
+let startedAt="", name="", idx=0, answers=[], ORDER=[], running=false, guard=false;
+let stage="intro";            // intro | mcq | sending | end
+let pending=null;             // payload waiting for the server's reply
+
+function ls(k,v){ try{ if(v===undefined) return localStorage.getItem(k); if(v===null) localStorage.removeItem(k); else localStorage.setItem(k,v) }catch(e){ return null } }
+
+/* ---------- start ---------- */
+function intro(){
+  document.body.classList.remove("locked");
+  if(ls(FLAG)){
+    const saved = ls(RESKEY);
+    if(saved){ try{ return showResult(JSON.parse(saved), false); }catch(e){} }
+    const pend = ls(PENDKEY);
+    if(pend){ try{ pending = JSON.parse(pend); name = pending.name; stage="sending"; return sendResult(); }catch(e){} }
+    return finish("Exam already taken", "You have already taken this exam on this device.", true);
+  }
+  app.innerHTML = `<div class="panel intro">
+    <h1>${esc(EXAM_TITLE)}</h1>
+    <p class="sub">${esc(SUBTITLE)}</p>
+    <div class="facts">
+      <div class="fact"><b>${QUESTIONS.length}</b><span>questions</span></div>
+      <div class="fact"><b>No limit</b><span>time</span></div>
+    </div>
+    <ul class="rules">
+      <li>You can go back to review or change answers until you submit.</li>
+      <li class="hard">Do not leave the exam page. Switching tabs or apps, exiting full screen, or opening developer tools / Inspect ends the exam immediately.</li>
+      <li>Copying, pasting and screenshots are blocked during the exam.</li>
+      <li>Your score appears after you submit. You will be able to take a screenshot of it.</li>
+    </ul>
+    <label class="f" for="nm">Full name</label>
+    <input type="text" id="nm" placeholder="Type your full name" autocomplete="off" maxlength="80">
+    <p class="err" id="er"></p>
+    <button class="btn full" id="go">Start exam</button>
+  </div>`;
+  $("go").onclick = async () => {
+    name = $("nm").value.trim();
+    if(name.length < 3){ $("er").textContent = "Enter your full name to continue."; $("nm").focus(); return; }
+    try{ await document.documentElement.requestFullscreen(); }catch(e){}
+    ORDER = shuf(QUESTIONS.map((q,i)=>({qi:i, oi:shuf(q.o.map((_,k)=>k))})));
+    idx = 0; answers = []; running = true; guard = true; stage = "mcq"; startedAt = new Date().toISOString(); ls(FLAG,"1");
+    document.body.classList.add("locked");
+    render();
+  };
+}
+
+/* ---------- questions ---------- */
+function render(){
+  const O = ORDER[idx], Q = QUESTIONS[O.qi], sel = answers[idx], last = idx===QUESTIONS.length-1;
+  const answered = answers.filter(a=>a!==undefined).length;
+  app.innerHTML = `
+  <div class="head">
+    <div class="row"><span class="who">${esc(name)}</span><span class="count">${idx+1} / ${QUESTIONS.length}</span></div>
+    <div class="dots">${QUESTIONS.map((_,i)=>`<i class="${i===idx?'cur':(answers[i]!==undefined?'done':'')}"></i>`).join("")}</div>
+  </div>
+  <h2 class="q">${esc(Q.q)}</h2>
+  <div>${O.oi.map((k,p)=>`<button class="opt ${sel===k?'sel':''}" data-i="${k}"><span class="k">${LET[p]}</span><span>${esc(Q.o[k])}</span></button>`).join("")}</div>
+  <div class="bottom"><div class="in">${idx>0?'<button class="btn ghost" id="bk">Back</button>':'<span></span>'}
+  <button class="btn" id="nx" ${sel===undefined?'disabled':''}>${last?'Submit':'Next'}</button></div></div>`;
+  app.querySelectorAll(".opt").forEach(b => b.onclick = () => { answers[idx] = +b.dataset.i; render(); });
+  if($("bk")) $("bk").onclick = () => { idx--; render(); window.scrollTo(0,0); };
+  $("nx").onclick = () => {
+    if(last){
+      const missing = QUESTIONS.length - answered;
+      if(missing>0 && !confirm("You have "+missing+" unanswered question(s). Submit anyway?")) return;
+      submit("completed");
+    } else { idx++; render(); window.scrollTo(0,0); }
+  };
+}
+
+/* ---------- submit + get the score from the server ---------- */
+function newId(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,10); }
+
+function submit(status){
+  if(stage!=="mcq") return;
+  stage = "sending"; running = false;               // exam is over: stop all protections from reacting
+  const ans = QUESTIONS.map(()=> "");
+  ORDER.forEach((O,i)=>{ if(answers[i]!==undefined) ans[O.qi] = LET[answers[i]]; });
+  pending = {kind:"mcq", name, status, answers:ans.join(","), startedAt, submissionId:newId()};
+  ls(PENDKEY, JSON.stringify(pending));
+  sendResult();
+}
+
+async function sendResult(){
+  guard = true;
+  app.innerHTML = `<div class="panel end"><div class="spin"></div><h2>Submitting…</h2><p>Please wait and do not close this page.</p></div>`;
+  window.scrollTo(0,0);
+  try{
+    const ctl = new AbortController(); const t = setTimeout(()=>ctl.abort(), 30000);
+    const r = await fetch(SHEET_URL, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify(pending), signal:ctl.signal, redirect:"follow"});
+    clearTimeout(t);
+    const j = await r.json();
+    if(!j || !j.ok) throw new Error((j && j.error) || "bad response");
+    const res = {name:j.name, score:j.score, total:j.total, percent:j.percent, submittedAt:j.submittedAt, status:pending.status};
+    ls(RESKEY, JSON.stringify(res)); ls(PENDKEY, null);
+    guard = false; stage = "end";
+    try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){}
+    showResult(res, true);
+  }catch(e){
+    app.innerHTML = `<div class="panel end bad"><div class="ic">!</div><h2>Could not reach the server</h2>
+    <p>Your answers are saved on this page. Check your internet connection, then press the button below.<br><b>Do not close or refresh this page.</b></p>
+    <button class="btn" id="rt">Try again</button></div>`;
+    $("rt").onclick = sendResult;
+  }
+}
+
+function showResult(r, fresh){
+  guard = false; stage = "end"; running = false;
+  document.body.classList.remove("locked");
+  shield.style.display = "none";
+  window.scrollTo(0,0);
+  const low = r.percent < 50;
+  app.innerHTML = `<div class="panel res ${low?'low':''}">
+    ${r.status==="terminated" ? '<p class="warnline">The exam was ended because you left the exam page. Your answers up to that point were scored.</p>' : ''}
+    <div class="exam">${esc(EXAM_TITLE)}</div>
+    <div class="nm">${esc(r.name)}</div>
+    <div class="big">${esc(r.score)}<small> / ${esc(r.total)}</small></div>
+    <div class="pct">${esc(r.percent)}%</div>
+    <div class="bar"><i style="width:${Math.max(0,Math.min(100,+r.percent||0))}%"></i></div>
+    <div class="meta"><div>Submitted at: <b>${esc(r.submittedAt)}</b></div></div>
+    <p class="note">You can take a screenshot of this page as proof of your result.</p>
+  </div>`;
+}
+
+function finish(title,msg,bad){
+  shield.style.display = "none";
+  app.innerHTML = `<div class="panel end ${bad?'bad':''}"><div class="ic">${bad?'!':'✓'}</div><h2>${esc(title)}</h2><p>${esc(msg)}</p></div>`;
+}
+
+/* ---------- protection (active only while running === true) ---------- */
+function violation(){ if(running && stage==="mcq") submit("terminated"); }
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) violation(); });
+window.addEventListener("blur",()=>{ if(running){ shield.style.display="block"; violation(); } });
+document.addEventListener("fullscreenchange",()=>{ if(running && !document.fullscreenElement) violation(); });
+window.addEventListener("pagehide",violation);
+["copy","cut","paste"].forEach(ev=>document.addEventListener(ev,e=>{ if(running && e.target.id!=="nm") e.preventDefault(); }));
+["contextmenu","dragstart","selectstart"].forEach(ev=>document.addEventListener(ev,e=>{ if(!running) return; const t=e.target.tagName; if(t!=="INPUT"&&t!=="TEXTAREA") e.preventDefault(); }));
+document.addEventListener("keydown",e=>{
+  if(!running) return;
+  const k=(e.key||"").toLowerCase();
+  if(e.key==="PrintScreen"||k==="meta"||k==="f12"){ e.preventDefault(); try{navigator.clipboard.writeText("")}catch(x){} violation(); return; }
+  if((e.ctrlKey||e.metaKey)&&["c","x","v","p","s","u","a"].includes(k)) e.preventDefault();
+  if(e.ctrlKey&&e.shiftKey&&["i","j","c","s"].includes(k)){ e.preventDefault(); violation(); }
+  if(e.metaKey&&e.shiftKey){ e.preventDefault(); violation(); }
+  if(e.metaKey&&e.altKey&&["i","j","c","u"].includes(k)){ e.preventDefault(); violation(); }
+});
+document.addEventListener("keyup",e=>{ if(running && e.key==="PrintScreen"){ try{navigator.clipboard.writeText("")}catch(x){} violation(); } });
+const FINE = typeof matchMedia!=="undefined" && matchMedia("(pointer:fine)").matches;
+setInterval(()=>{
+  if(!running || !FINE) return;
+  if(document.fullscreenElement && (outerWidth-innerWidth>120 || outerHeight-innerHeight>120)) return violation();
+  const t=performance.now(); (function(){ debugger; })();
+  if(performance.now()-t>200) violation();
+},1000);
+window.addEventListener("beforeunload",e=>{ if(guard){ e.preventDefault(); e.returnValue=""; } });
+
+intro();
+</script>
+</body>
+</html>
